@@ -1,0 +1,80 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>@ViewBag.Title - My ASP.NET Application</title>
+  @Styles.Render("~/Content/css")
+  @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <li>@Html.ActionLink("Home", "Index", "Home")</li>
+          <li>@Html.ActionLink("About", "About", "Home")</li>
+          <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+          <li>@Html.ActionLink("Notification", "Notification", "Home")</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="container body-content">
+
+    <!-- Container to hold alerts from SignalR -->
+    <div id="alert-placeholder" style="padding: 5px;"></div>
+
+    @RenderBody()
+    <hr />
+    <footer>
+      <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+    </footer>
+  </div>
+
+  @Scripts.Render("~/bundles/jquery")
+  @Scripts.Render("~/bundles/bootstrap")
+
+  <script src="~/Scripts/jquery.signalR-2.2.0.min.js"></script>
+  <script src="~/SignalR/Hubs"></script>
+
+  <script type="text/javascript">
+    //a helper function to encode HTML values.
+    function htmlEncode(value) {
+      return $('<div />').text(value).html();
+    }
+
+    //execute on document ready
+    $(function () {
+
+      //function that the hub can call when it receives a notification.
+      $.connection.notificationHub.client.displayNotification = function (title, message, alertType) {
+
+        //Create the bootstrap alert html
+        var alertHtml = '<div class="alert alert-' + htmlEncode(alertType) + ' alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert"><span>×</span></button><strong>' + htmlEncode(title) + '</strong> ' + htmlEncode(message) + '</div>';
+
+        $(alertHtml)
+          .hide()                           //hide the newly created element (this is required for fadeIn to work)
+          .appendTo('#alert-placeholder')   //add it to the palceholder in the page
+          .fadeIn(500);                     //little flair to grab user attention
+      };
+
+      window.notifyApp = {
+        hubConnector: $.connection.hub.start()  //start the connection and store object returned globally for access in child views
+      };
+
+    });
+
+  </script>
+
+  @RenderSection("scripts", required: false)
+</body>
+</html>

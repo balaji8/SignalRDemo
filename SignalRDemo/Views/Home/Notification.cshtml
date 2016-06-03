@@ -1,0 +1,53 @@
+﻿@{
+    ViewBag.Title = "Notification";
+}
+<h2>@ViewBag.Title.</h2>
+
+<form role="form">
+  <div class="form-group">
+    <label for="title">Notification Title:</label>
+    <input type="text" class="form-control" id="title">
+  </div>
+  <div class="form-group">
+    <label for="message">Notification Message:</label>
+    <input type="text" class="form-control" id="message">
+  </div>
+  <div class="form-group">
+    <label for="alert-type">Notification Type:</label>
+    <select class="form-control" id="alert-type">
+      <option value="info" selected>Information</option>
+      <option value="success">Success</option>
+      <option value="warning">Warning</option>
+      <option value="danger">Error</option>
+    </select>
+  </div>
+  <button type="button" class="btn btn-primary" id="send-notification">Send to All</button>
+</form>
+
+@section Scripts{
+  <script type="text/javascript">
+    $(function () {     //execute on document ready
+
+      //access the global hubConnector object created by master page
+      window.notifyApp.hubConnector.done(function () {
+
+        $('#send-notification').click(function () {
+
+          var title = $('#title').val(),
+              message = $('#message').val(),
+              type = $('#alert-type').val();
+
+          //Call the notifyAll method on the hub. Notice camelCasing on the method name.
+          $.connection.notificationHub.server.notifyAll(title, message, type);
+
+          //Clear values and reset focus for next comment.
+          $('#title').val('').focus();
+          $('#message').val('');
+
+        });   //end send notification click handler
+
+      });     //end hub started handler
+
+    });       //end document ready event handler
+  </script>
+}
